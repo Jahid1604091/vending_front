@@ -1,0 +1,90 @@
+.dispensing-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dispensing-container h1 {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+}
+
+.dispensing-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.dispensing-table th,
+.dispensing-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.dispensing-table th {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+}
+
+.dispensing-table td {
+  vertical-align: middle;
+}
+
+.dispensing-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.status-pending {
+  color: #f59e0b;
+}
+
+.status-dispensing {
+  color: #3b82f6;
+}
+
+.status-dispensed {
+  color: #059669;
+}
+
+.status-failed {
+  color: #ef4444;
+}
+
+.status-disconnected {
+  color: #6b7280;
+}
+
+.order-status {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.order-status.success {
+  color: #059669;
+}
+
+.order-status.failed {
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .dispensing-table th,
+  .dispensing-table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .dispensing-image {
+    width: 40px;
+    height: 40px;
+  }
+}

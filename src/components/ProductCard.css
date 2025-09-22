@@ -1,0 +1,74 @@
+.product-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+}
+
+.product-image {
+  width: 100%;
+  height: 150px;
+  object-fit: contain; /* <-- changed from cover to contain */
+  background-color: #f5f5f5; /* optional: nice background for empty space */
+  border-radius: 8px;
+}
+
+
+.product-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.button-slot {
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  color: white;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.button-buy {
+  background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+}
+
+.button-buy:hover {
+  background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+  transform: translateY(-2px);
+}
+
+.button-cart {
+  background: linear-gradient(135deg, #FACC15, #FFD454);
+  color: #1E3A8A;
+}
+
+.button-cart:hover {
+  background: linear-gradient(135deg, #FFD454, #FACC15);
+  transform: translateY(-2px);
+}
+
+
+.product-stock.in {
+  color: green;
+  font-weight: bold;
+}
+
+.product-stock.out {
+  color: red;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
