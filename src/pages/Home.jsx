@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api";
 import ProductCard from "../components/ProductCard";
 import "./Home.css";
+import Loader from "../components/Loader";
 
 export default function Home({ cart, setCart }) {
   const [products, setProducts] = useState([]);
@@ -35,7 +36,10 @@ export default function Home({ cart, setCart }) {
           return prevCart;
         }
       } else {
-        return [...prevCart, { ...product, quantity: 1, stock: product.quantity }];
+        return [
+          ...prevCart,
+          { ...product, quantity: 1, stock: product.quantity },
+        ];
       }
     });
   };
@@ -54,10 +58,9 @@ export default function Home({ cart, setCart }) {
 
   return (
     <div className="home-container">
-      <h1 className="home-title">Snacks Vending</h1>
       {error && <p className="error-message">{error}</p>}
       {products.length === 0 && !error ? (
-        <p>Loading products...</p>
+        <Loader />
       ) : (
         <div className="products-grid">
           {products.map((product) => (

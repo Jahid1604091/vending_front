@@ -67,7 +67,7 @@
 //                     src={item.image}
 //                     alt={item.name}
 //                     className="dispensing-image"
-//                     onError={(e) => (e.target.src = "/images/fallback.jpg")}
+//                     onError={(e) => (e.target.src = "/images/no-image.png")}
 //                   />
 //                 </td>
 //                 <td>{item.name}</td>
@@ -206,10 +206,10 @@ export default function Dispensing() {
                 <tr key={item.id}>
                   <td>
                     <img
-                      src={process.env.REACT_APP_API_URL + item.image || "/images/fallback.jpg"}
+                      src={process.env.REACT_APP_API_URL + item.image || "/images/no-image.png"}
                       alt={item.name || "Unknown"}
                       className="dispensing-image"
-                      onError={(e) => (e.target.src = "/images/fallback.jpg")}
+                      onError={(e) => (e.target.src = "/images/no-image.png")}
                     />
                   </td>
                   <td>{item.name || "Unknown"}</td>

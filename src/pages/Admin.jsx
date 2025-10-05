@@ -235,12 +235,12 @@ export default function Admin() {
                   </div>
                 ) : (
                   <img
-                    src={p.image ? `${backendUrl}${p.image}?t=${Date.now()}` : "/images/fallback.jpg"}
+                    src={p.image ? `${backendUrl}${p.image}?t=${Date.now()}` : "/images/no-image.png"}
                     alt={p.name}
                     className="admin-image"
                     onError={(e) => {
                       console.error(`Image failed to load: ${p.image}`);
-                      e.target.src = "/images/fallback.jpg";
+                      e.target.src = "/images/no-image.png";
                     }}
                   />
                 )}

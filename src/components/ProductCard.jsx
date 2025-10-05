@@ -9,11 +9,11 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
     <div className="product-card">
       <img
         className="product-image"
-        src={product.image ? `${backendUrl}${product.image}?t=${Date.now()}` : "/images/fallback.jpg"}
+        src={product.image ? `${backendUrl}${product.image}?t=${Date.now()}` : "/images/no-image.png"}
         alt={product.name}
         onError={(e) => {
           console.error(`Image failed to load: ${product.image}`);
-          e.target.src = "/images/fallback.jpg";
+          e.target.src = "/images/no-image.png";
         }}
       />
       <h3 className="product-name">{product.name}</h3>
