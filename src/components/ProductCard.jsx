@@ -3,7 +3,7 @@ import "./ProductCard.css";
 
 const ProductCard = ({ product, addToCart, handleBuy }) => {
   const isOutOfStock = product.quantity === 0;
-  const backendUrl = "http://localhost:5001"; // Backend base URL
+  const backendUrl = process.env.REACT_APP_API_URL; // Backend base URL
 
   return (
     <div className="product-card">

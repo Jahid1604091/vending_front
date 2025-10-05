@@ -206,7 +206,7 @@ export default function Dispensing() {
                 <tr key={item.id}>
                   <td>
                     <img
-                      src={item.image || "/images/fallback.jpg"}
+                      src={process.env.REACT_APP_API_URL + item.image || "/images/fallback.jpg"}
                       alt={item.name || "Unknown"}
                       className="dispensing-image"
                       onError={(e) => (e.target.src = "/images/fallback.jpg")}

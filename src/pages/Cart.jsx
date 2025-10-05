@@ -112,7 +112,7 @@ export default function Cart({ cart, setCart }) {
           {localCart.map((item, index) => (
             <div key={index} className="cart-item">
               <img
-                src={item.image || "/images/fallback.jpg"}
+                src={process.env.REACT_APP_API_URL+item.image || "/images/fallback.jpg"}
                 alt={item.name || "Unknown"}
                 className="cart-item-image"
                 onError={(e) => {
