@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../api";
 import "./Cart.css";
 
@@ -104,6 +104,7 @@ export default function Cart({ cart, setCart }) {
 
   return (
     <div className="cart-container">
+      <Link to="/" className="back-link">← Back </Link>
       <h1>Your Cart</h1>
       {localCart.length === 0 ? (
         <p className="empty-cart">Your cart is empty.</p>
