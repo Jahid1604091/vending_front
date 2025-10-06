@@ -104,57 +104,107 @@ export default function Cart({ cart, setCart }) {
 
   return (
     <div className="cart-container">
-      <Link to="/" className="back-link">← Back </Link>
-      <h1>Your Cart</h1>
+      <Link to="/" className="back-link">
+        ← Back to Shop
+      </Link>
+      <h1>🛒 Your Shopping Cart</h1>
       {localCart.length === 0 ? (
-        <p className="empty-cart">Your cart is empty.</p>
+        <div className="empty-cart-wrapper">
+          <p className="empty-cart">Your cart is empty.</p>
+          <Link to="/" className="continue-shopping-btn">
+            Continue Shopping
+          </Link>
+        </div>
       ) : (
-        <div className="cart-items">
-          {localCart.map((item, index) => (
-            <div key={index} className="cart-item">
-              <img
-                src={process.env.REACT_APP_API_URL+item.image || "/images/no-image.png"}
-                alt={item.name || "Unknown"}
-                className="cart-item-image"
-                onError={(e) => {
-                  e.target.src = "/images/no-image.png";
-                }}
-              />
-              <div className="cart-item-info">
-                <h3>{item.name || "Unknown"}</h3>
-                <p>৳{item.price.toFixed(2)}</p>
-                <p>Stock: {item.stock}</p>
-                <div className="quantity-controls">
-                  <button onClick={() => decreaseQty(index)}>-</button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => increaseQty(index)}>+</button>
+        <div className="cart-content">
+          <div className="cart-items">
+            {localCart.map((item, index) => (
+              <div key={index} className="cart-item">
+                <img
+                  src={process.env.REACT_APP_API_URL + item.image || "/images/no-image.png"}
+                  alt={item.name || "Unknown"}
+                  className="cart-item-image"
+                  onError={(e) => {
+                    e.target.src = "/images/no-image.png";
+                  }}
+                />
+                <div className="cart-item-info">
+                  <h3>{item.name || "Unknown"}</h3>
+                  <p className="item-price">৳{item.price.toFixed(2)}</p>
+                  <p className="item-stock">Available: {item.stock} in stock</p>
+                  <div className="quantity-controls">
+                    <button onClick={() => decreaseQty(index)} aria-label="Decrease quantity">
+                      −
+                    </button>
+                    <span className="quantity-display">{item.quantity}</span>
+                    <button onClick={() => increaseQty(index)} aria-label="Increase quantity">
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div className="item-subtotal">
+                  <p className="subtotal-label">Subtotal</p>
+                  <p className="subtotal-price">৳{(item.price * item.quantity).toFixed(2)}</p>
+                  <button className="remove-btn" onClick={() => removeItem(index)}>
+                    🗑️ Remove
+                  </button>
                 </div>
               </div>
-              <button className="remove-btn" onClick={() => removeItem(index)}>
-                Remove
-              </button>
+            ))}
+          </div>
+
+          <div className="cart-summary">
+            <h2 className="summary-title">Order Summary</h2>
+            
+            <div className="summary-row">
+              <span>Items ({localCart.length})</span>
+              <span>৳{totalPrice.toFixed(2)}</span>
             </div>
-          ))}
-          <div className="cart-total">
-            <h2>Total: ৳{totalPrice.toFixed(2)}</h2>
+            
+            <div className="summary-divider"></div>
+            
+            <div className="summary-row total-row">
+              <span>Total Amount</span>
+              <span className="total-amount">৳{totalPrice.toFixed(2)}</span>
+            </div>
+
             {cardData ? (
               <div className="card-info">
-                <p>User ID: {cardData.userid}</p>
-                <p>Username: {cardData.username}</p>
-                <p>Credit: ৳{cardData.credit.toFixed(2)}</p>
+                <h3 className="card-info-title">💳 Payment Card Info</h3>
+                <div className="card-details">
+                  <div className="card-detail-row">
+                    <span className="detail-label">User ID:</span>
+                    <span className="detail-value">{cardData.userid}</span>
+                  </div>
+                  <div className="card-detail-row">
+                    <span className="detail-label">Name:</span>
+                    <span className="detail-value">{cardData.username}</span>
+                  </div>
+                  <div className="card-detail-row">
+                    <span className="detail-label">Available Credit:</span>
+                    <span className="detail-value credit-amount">৳{cardData.credit.toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
             ) : (
-              <p className="error">{error || "Please insert the card for checkout"}</p>
+              <div className="card-warning">
+                <p className="warning-icon">⚠️</p>
+                <p className="warning-text">Please insert your card to proceed with checkout</p>
+              </div>
             )}
+
             {error && error !== "Please insert the card for checkout" && (
-              <p className="error">{error}</p>
+              <div className="error-message">
+                <p>❌ {error}</p>
+              </div>
             )}
+
             <button
               className="checkout-btn"
               onClick={checkout}
-              disabled={!cardData || error === "Invalid user card"}
+              disabled={!cardData || cardData.credit < totalPrice || error === "Invalid user card"}
             >
-              Checkout
+              {!cardData ? "Insert Card to Checkout" : "Proceed to Checkout"}
             </button>
           </div>
         </div>
