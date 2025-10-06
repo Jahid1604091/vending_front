@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
-
+import logo from "../fn_logo.svg";
 export default function Navbar({ totalQuantity, isAuthenticated, onLogout }) {
   const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ export default function Navbar({ totalQuantity, isAuthenticated, onLogout }) {
   return (
     <nav className="navbar">
       <Link to='/' className="navbar-title">
-         <img src="/fn_logo.svg" alt="Snacks Vending" /> &nbsp;
+         <img src={logo} alt="Snacks Vending" /> &nbsp;
           <h2>Snacks Vending</h2>
       </Link>
       <div className="nav-links">
