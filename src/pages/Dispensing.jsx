@@ -1,105 +1,7 @@
-// import React, { useState, useEffect } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import "./Dispensing.css";
-
-// export default function Dispensing() {
-//   const location = useLocation();
-//   const navigate = useNavigate();
-//   const { cart } = location.state || { cart: [] };
-//   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-//   const [statuses, setStatuses] = useState({});
-
-//   useEffect(() => {
-//     if (cart.length === 0) {
-//       console.log("🕒 No items in cart, redirecting to home");
-//       navigate("/", { replace: true });
-//       return;
-//     }
-
-//     // Initialize statuses based on cart's failed property
-//     setStatuses(
-//       cart.reduce((acc, item) => ({
-//         ...acc,
-//         [item.id]: { status: item.failed ? "Failed" : "Pending" }
-//       }), {})
-//     );
-
-//     if (currentItemIndex >= cart.length) {
-//       console.log("🕒 All items processed, redirecting to home");
-//       navigate("/", { replace: true });
-//       return;
-//     }
-
-//     if (!cart[currentItemIndex].failed) {
-//       setStatuses((prev) => ({
-//         ...prev,
-//         [cart[currentItemIndex].id]: { status: "Dispensing" }
-//       }));
-//     }
-
-//     const timer = setTimeout(() => {
-//       setCurrentItemIndex((prev) => prev + 1);
-//     }, 3000);
-
-//     return () => clearTimeout(timer);
-//   }, [currentItemIndex, cart, navigate]); // Includes all dependencies
-
-//   return (
-//     <div className="dispensing-container">
-//       <h1>Dispensing Your Order</h1>
-//       {cart.length === 0 ? (
-//         <p>No items to dispense</p>
-//       ) : (
-//         <table className="dispensing-table">
-//           <thead>
-//             <tr>
-//               <th>Image</th>
-//               <th>Name</th>
-//               <th>Quantity</th>
-//               <th>Status</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {cart.map((item) => (
-//               <tr key={item.id}>
-//                 <td>
-//                   <img
-//                     src={item.image}
-//                     alt={item.name}
-//                     className="dispensing-image"
-//                     onError={(e) => (e.target.src = "/images/no-image.png")}
-//                   />
-//                 </td>
-//                 <td>{item.name}</td>
-//                 <td>{item.quantity}</td>
-//                 <td className={`status-${(statuses[item.id]?.status || "Pending").toLowerCase()}`}>
-//                   {statuses[item.id]?.status || "Pending"}
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Dispensing.css";
+import noImg from "../no-image.png";
 
 export default function Dispensing() {
   const location = useLocation();
@@ -206,10 +108,10 @@ export default function Dispensing() {
                 <tr key={item.id}>
                   <td>
                     <img
-                      src={process.env.REACT_APP_API_URL + item.image || "/images/no-image.png"}
+                      src={process.env.REACT_APP_API_URL + item.image || noImg}
                       alt={item.name || "Unknown"}
                       className="dispensing-image"
-                      onError={(e) => (e.target.src = "/images/no-image.png")}
+                      onError={(e) => (e.target.src = noImg)}
                     />
                   </td>
                   <td>{item.name || "Unknown"}</td>

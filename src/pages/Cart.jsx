@@ -3,6 +3,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../api";
 import "./Cart.css";
 import noImg from "../no-image.png";
+import mqtt from "mqtt";
+import Loader from "../components/Loader";
 
 export default function Cart({ cart, setCart }) {
   const navigate = useNavigate();
@@ -11,28 +13,61 @@ export default function Cart({ cart, setCart }) {
   const [localCart, setLocalCart] = useState(initialCart);
   const [cardData, setCardData] = useState(null);
   const [error, setError] = useState(null);
-
+  const [client, setClient] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     setLocalCart(initialCart);
   }, [initialCart]);
 
-  useEffect(() => {
-    const fetchCardData = async () => {
-      try {
-        const response = await api.get("/api/card-data");
-        console.log("📋 Fetched card data:", response.data);
-        setCardData(response.data.error ? null : response.data);
-        setError(response.data.error || null);
-      } catch (err) {
-        console.error("❌ Error fetching card data:", err.message);
-        setCardData(null);
-        setError("Failed to fetch card data");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCardData = async () => {
+  //     try {
+  //       const response = await api.get("/api/card-data");
+  //       console.log("📋 Fetched card data:", response.data);
+  //       setCardData(response.data.error ? null : response.data);
+  //       setError(response.data.error || null);
+  //     } catch (err) {
+  //       console.error("❌ Error fetching card data:", err.message);
+  //       setCardData(null);
+  //       setError("Failed to fetch card data");
+  //     }
+  //   };
 
-    fetchCardData();
-    const interval = setInterval(fetchCardData, 5000);
-    return () => clearInterval(interval);
+  //   fetchCardData();
+  //   // const interval = setInterval(fetchCardData, 5000);
+  //   // return () => clearInterval(interval);
+  // }, []);
+
+  useEffect(() => {
+    const client = mqtt.connect("ws://localhost:9003", {
+      keepalive: 0,
+    });
+
+    client.on("connect", () => {
+      console.log("Connected to MQTT broker");
+      client.subscribe(
+        process.env.REACT_APP_MQTT_TOPIC_CARD_RESPONSE,
+        (err) => {
+          if (err) {
+            console.error("Subscription error:", err);
+          }
+        }
+      );
+    });
+
+    client.on("message", (topic, message) => {
+      setMessages((prevMessages) => [...prevMessages, message.toString()]);
+      setCardData(JSON.parse(message.toString()));
+      setError(JSON.parse(message.toString()) || null);
+    });
+
+    setClient(client);
+
+    return () => {
+      client.end();
+      setClient(null);
+    };
   }, []);
 
   const increaseQty = (index) => {
@@ -85,6 +120,7 @@ export default function Cart({ cart, setCart }) {
         quantity: item.quantity,
       }));
 
+      setIsLoading(true);
       const res = await api.post("/api/order", { products: orderProducts });
       console.log("✅ Checkout response:", res.data);
 
@@ -92,16 +128,30 @@ export default function Cart({ cart, setCart }) {
         navigate("/dispensing", { state: { cart: res.data.cart } });
         setCart([]);
         setLocalCart([]);
+        setIsLoading(false);
       } else {
         setError(res.data.error || "Order failed. Try again.");
+        setIsLoading(false);
       }
     } catch (err) {
-      console.error("Checkout error:", err.message, err.response?.status, err.response?.data);
-      setError(err.response?.data?.error || "Error while placing order. Please try again.");
+      console.error(
+        "Checkout error:",
+        err.message,
+        err.response?.status,
+        err.response?.data
+      );
+      setError(
+        err.response?.data?.error ||
+          "Error while placing order. Please try again."
+      );
+      setIsLoading(false);
     }
   };
 
-  const totalPrice = localCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = localCart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   return (
     <div className="cart-container">
@@ -134,19 +184,30 @@ export default function Cart({ cart, setCart }) {
                   <p className="item-price">৳{item.price.toFixed(2)}</p>
                   <p className="item-stock">Available: {item.stock} in stock</p>
                   <div className="quantity-controls">
-                    <button onClick={() => decreaseQty(index)} aria-label="Decrease quantity">
+                    <button
+                      onClick={() => decreaseQty(index)}
+                      aria-label="Decrease quantity"
+                    >
                       −
                     </button>
                     <span className="quantity-display">{item.quantity}</span>
-                    <button onClick={() => increaseQty(index)} aria-label="Increase quantity">
+                    <button
+                      onClick={() => increaseQty(index)}
+                      aria-label="Increase quantity"
+                    >
                       +
                     </button>
                   </div>
                 </div>
                 <div className="item-subtotal">
                   <p className="subtotal-label">Subtotal</p>
-                  <p className="subtotal-price">৳{(item.price * item.quantity).toFixed(2)}</p>
-                  <button className="remove-btn" onClick={() => removeItem(index)}>
+                  <p className="subtotal-price">
+                    ৳{(item.price * item.quantity).toFixed(2)}
+                  </p>
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeItem(index)}
+                  >
                     🗑️ Remove
                   </button>
                 </div>
@@ -156,14 +217,14 @@ export default function Cart({ cart, setCart }) {
 
           <div className="cart-summary">
             <h2 className="summary-title">Order Summary</h2>
-            
+
             <div className="summary-row">
               <span>Items ({localCart.length})</span>
               <span>৳{totalPrice.toFixed(2)}</span>
             </div>
-            
+
             <div className="summary-divider"></div>
-            
+
             <div className="summary-row total-row">
               <span>Total Amount</span>
               <span className="total-amount">৳{totalPrice.toFixed(2)}</span>
@@ -183,30 +244,42 @@ export default function Cart({ cart, setCart }) {
                   </div>
                   <div className="card-detail-row">
                     <span className="detail-label">Available Credit:</span>
-                    <span className="detail-value credit-amount">৳{cardData.credit.toFixed(2)}</span>
+                    <span className="detail-value credit-amount">
+                      ৳{cardData.credit.toFixed(2)}
+                    </span>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="card-warning">
                 <p className="warning-icon">⚠️</p>
-                <p className="warning-text">Please insert your card to proceed with checkout</p>
+                <p className="warning-text">
+                  Please insert your card to proceed with checkout
+                </p>
               </div>
             )}
 
-            {error && error !== "Please insert the card for checkout" && (
+            {/* {error && error !== "Please insert the card for checkout" && (
               <div className="error-message">
                 <p>❌ {error}</p>
               </div>
-            )}
+            )} */}
 
-            <button
-              className="checkout-btn"
-              onClick={checkout}
-              disabled={!cardData || cardData.credit < totalPrice || error === "Invalid user card"}
-            >
-              {!cardData ? "Insert Card to Checkout" : "Proceed to Checkout"}
-            </button>
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <button
+                className="checkout-btn"
+                onClick={checkout}
+                disabled={
+                  !cardData ||
+                  cardData.credit < totalPrice ||
+                  error === "Invalid user card"
+                }
+              >
+                {!cardData ? "Insert Card to Checkout" : "Proceed to Checkout"}
+              </button>
+            )}
           </div>
         </div>
       )}
