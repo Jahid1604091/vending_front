@@ -12,10 +12,10 @@ export default function Navbar({ totalQuantity, isAuthenticated, onLogout }) {
 
   return (
     <nav className="navbar">
-      <div className="navbar-title">
+      <Link to='/' className="navbar-title">
          <img src="/fn_logo.svg" alt="Snacks Vending" /> &nbsp;
           <h2>Snacks Vending</h2>
-      </div>
+      </Link>
       <div className="nav-links">
         <Link to="/">Home</Link>
         <Link to="/cart">

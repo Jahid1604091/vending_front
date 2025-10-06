@@ -107,7 +107,7 @@ export default function Cart({ cart, setCart }) {
       <Link to="/" className="back-link">
         ← Back to Shop
       </Link>
-      <h1>🛒 Your Shopping Cart</h1>
+      <h4>🛒 Your Shopping Cart</h4>
       {localCart.length === 0 ? (
         <div className="empty-cart-wrapper">
           <p className="empty-cart">Your cart is empty.</p>
