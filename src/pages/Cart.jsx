@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../api";
 import "./Cart.css";
+import noImg from "../no-image.png";
 
 export default function Cart({ cart, setCart }) {
   const navigate = useNavigate();
@@ -121,11 +122,11 @@ export default function Cart({ cart, setCart }) {
             {localCart.map((item, index) => (
               <div key={index} className="cart-item">
                 <img
-                  src={process.env.REACT_APP_API_URL + item.image || "/images/no-image.png"}
+                  src={process.env.REACT_APP_API_URL + item.image || noImg}
                   alt={item.name || "Unknown"}
                   className="cart-item-image"
                   onError={(e) => {
-                    e.target.src = "/images/no-image.png";
+                    e.target.src = noImg;
                   }}
                 />
                 <div className="cart-item-info">
