@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import api from "../api";
 import "./Cart.css";
 import noImg from "../no-image.png";
+import processSound from "../process.mp3";
 import mqtt from "mqtt";
 import Loader from "../components/Loader";
 
 export default function Cart({ cart, setCart }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const audioRef = useRef(null);
   const initialCart = location.state?.cart || cart;
   const [localCart, setLocalCart] = useState(initialCart);
   const [cardData, setCardData] = useState(null);
@@ -16,33 +18,18 @@ export default function Cart({ cart, setCart }) {
   const [client, setClient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCardLoading, setIsCardLoading] = useState(true);
+
   useEffect(() => {
     setLocalCart(initialCart);
   }, [initialCart]);
-
-  // useEffect(() => {
-  //   const fetchCardData = async () => {
-  //     try {
-  //       const response = await api.get("/api/card-data");
-  //       console.log("📋 Fetched card data:", response.data);
-  //       setCardData(response.data.error ? null : response.data);
-  //       setError(response.data.error || null);
-  //     } catch (err) {
-  //       console.error("❌ Error fetching card data:", err.message);
-  //       setCardData(null);
-  //       setError("Failed to fetch card data");
-  //     }
-  //   };
-
-  //   fetchCardData();
-  //   // const interval = setInterval(fetchCardData, 5000);
-  //   // return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     const client = mqtt.connect("ws://localhost:9003", {
       keepalive: 0,
     });
+
+    let cardRemovalTimeout = null;
 
     client.on("connect", () => {
       console.log("Connected to MQTT broker");
@@ -58,13 +45,35 @@ export default function Cart({ cart, setCart }) {
 
     client.on("message", (topic, message) => {
       setMessages((prevMessages) => [...prevMessages, message.toString()]);
-      setCardData(JSON.parse(message.toString()));
-      setError(JSON.parse(message.toString()) || null);
+      const data = JSON.parse(message.toString());
+
+      // Clear any existing timeout
+      if (cardRemovalTimeout) {
+        clearTimeout(cardRemovalTimeout);
+        cardRemovalTimeout = null;
+      }
+
+      // If data is null, wait 5 seconds before setting it
+      if (data === null) {
+        cardRemovalTimeout = setTimeout(() => {
+          setCardData(null);
+          setError("Please insert the card for checkout");
+          setIsCardLoading(false);
+        }, process.env.REACT_APP_CARD_REMOVAL_TIMEOUT || 5000);
+      } else {
+        // If valid data, set immediately
+        setCardData(data);
+        setError(null);
+        setIsCardLoading(false);
+      }
     });
 
     setClient(client);
 
     return () => {
+      if (cardRemovalTimeout) {
+        clearTimeout(cardRemovalTimeout);
+      }
       client.end();
       setClient(null);
     };
@@ -121,14 +130,18 @@ export default function Cart({ cart, setCart }) {
       }));
 
       setIsLoading(true);
-      const res = await api.post("/api/order", { products: orderProducts });
-      console.log("✅ Checkout response:", res.data);
+      audioRef.current.play();
+      const res = await api.post("/api/order", {
+        products: orderProducts,
+        cardData,
+      });
 
       if (res.data.success) {
         navigate("/dispensing", { state: { cart: res.data.cart } });
         setCart([]);
         setLocalCart([]);
         setIsLoading(false);
+        audioRef.current.pause();
       } else {
         setError(res.data.error || "Order failed. Try again.");
         setIsLoading(false);
@@ -145,6 +158,7 @@ export default function Cart({ cart, setCart }) {
           "Error while placing order. Please try again."
       );
       setIsLoading(false);
+      audioRef.current.stop();
     }
   };
 
@@ -283,6 +297,7 @@ export default function Cart({ cart, setCart }) {
           </div>
         </div>
       )}
+      <audio ref={audioRef} src={processSound} />
     </div>
   );
 }

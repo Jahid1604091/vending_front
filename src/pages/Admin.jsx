@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 import api from "../api";
 import "./Admin.css";
 import "./Users.css";
-
+import noImg from "../no-image.png";
 export default function Admin() {
   const [products, setProducts] = useState([]);
   const [editing, setEditing] = useState(null);
@@ -17,7 +17,7 @@ export default function Admin() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
-  const backendUrl = "http://localhost:5001"; // Backend base URL
+  const backendUrl = process.env.REACT_APP_API_URL; // Backend base URL
 
   const fetchProducts = async () => {
     try {
@@ -235,12 +235,12 @@ export default function Admin() {
                   </div>
                 ) : (
                   <img
-                    src={p.image ? `${backendUrl}${p.image}?t=${Date.now()}` : "/images/no-image.png"}
+                    src={p.image ? `${backendUrl}${p.image}?t=${Date.now()}` : noImg}
                     alt={p.name}
                     className="admin-image"
                     onError={(e) => {
                       console.error(`Image failed to load: ${p.image}`);
-                      e.target.src = "/images/no-image.png";
+                      e.target.src = noImg;
                     }}
                   />
                 )}

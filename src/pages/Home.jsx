@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../api";
 import ProductCard from "../components/ProductCard";
 import "./Home.css";
@@ -9,6 +9,7 @@ export default function Home({ cart, setCart }) {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     api
@@ -21,7 +22,7 @@ export default function Home({ cart, setCart }) {
         console.error("Error fetching products:", err.message);
         setError("Failed to load products. Please try again later.");
       });
-  }, []);
+  }, [location.pathname]);
 
   const handleAddToCart = (product) => {
     setCart((prevCart) => {

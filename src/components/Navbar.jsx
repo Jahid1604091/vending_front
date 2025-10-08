@@ -14,7 +14,7 @@ export default function Navbar({ totalQuantity, isAuthenticated, onLogout }) {
     <nav className="navbar">
       <Link to='/' className="navbar-title">
          <img src={logo} alt="Snacks Vending" /> &nbsp;
-          <h2>Snacks Vending</h2>
+          <h3>Snacks Vending</h3>
       </Link>
       <div className="nav-links">
         <Link to="/">Home</Link>
