@@ -4,80 +4,51 @@ import api from "../api";
 import "./Cart.css";
 import noImg from "../no-image.png";
 import processSound from "../process.mp3";
-import mqtt from "mqtt";
 import Loader from "../components/Loader";
 
-export default function Cart({ cart, setCart }) {
+export default function Cart({
+  cart,
+  setCart,
+  cardData,
+  isMqttConnected,
+  isCardLoading,
+  error,
+  setError,
+}) {
   const navigate = useNavigate();
   const location = useLocation();
   const audioRef = useRef(null);
   const initialCart = location.state?.cart || cart;
   const [localCart, setLocalCart] = useState(initialCart);
-  const [cardData, setCardData] = useState(null);
-  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCardLoading, setIsCardLoading] = useState(true);
+  const [balance, setBalance] = useState(0);
+  const [isBalanceChecking, setIsBalanceChecking] = useState(false);
 
   useEffect(() => {
     setLocalCart(initialCart);
   }, [initialCart]);
 
+  const fetchCardBalance = async () => {
+    try {
+      setIsBalanceChecking(true);
+      const res = await api.post("/api/check-balance", {
+        cardData,
+      });
+      if (res.data.success) {
+        setBalance(res.data.balance);
+      }
+      setIsBalanceChecking(false);
+    } catch (error) {
+      console.log(error);
+      setIsBalanceChecking(false);
+    }
+  };
+
   useEffect(() => {
-    const client = mqtt.connect("ws://localhost:9003", {
-      keepalive: 0,
-    });
-
-    let cardRemovalTimeout = null;
-
-    client.on("connect", () => {
-      console.log("Connected to MQTT broker");
-      client.subscribe(
-        process.env.REACT_APP_MQTT_TOPIC_CARD_RESPONSE,
-        (err) => {
-          if (err) {
-            console.error("Subscription error:", err);
-          }
-        }
-      );
-    });
-
-    client.on("message", (topic, message) => {
-      setMessages((prevMessages) => [...prevMessages, message.toString()]);
-      const data = JSON.parse(message.toString());
-
-      // Clear any existing timeout
-      if (cardRemovalTimeout) {
-        clearTimeout(cardRemovalTimeout);
-        cardRemovalTimeout = null;
-      }
-
-      // If data is null, wait 5 seconds before setting it
-      if (data === null) {
-        cardRemovalTimeout = setTimeout(() => {
-          setCardData(null);
-          setError("Please insert the card for checkout");
-          setIsCardLoading(false);
-        }, process.env.REACT_APP_CARD_REMOVAL_TIMEOUT || 5000);
-      } else {
-        // If valid data, set immediately
-        setCardData(data);
-        setError(null);
-        setIsCardLoading(false);
-      }
-    });
-
-    setClient(client);
-
-    return () => {
-      if (cardRemovalTimeout) {
-        clearTimeout(cardRemovalTimeout);
-      }
-      client.end();
-      setClient(null);
-    };
-  }, []);
+    fetchCardBalance();
+  }, [cardData]);
 
   const increaseQty = (index) => {
     const newCart = [...localCart];
@@ -123,6 +94,11 @@ export default function Cart({ cart, setCart }) {
       return;
     }
 
+    if (balance < totalPrice) {
+      setError("Insufficient balance. Please recharge your card.");
+      return;
+    }
+
     try {
       const orderProducts = localCart.map((item) => ({
         id: item.id,
@@ -130,7 +106,14 @@ export default function Cart({ cart, setCart }) {
       }));
 
       setIsLoading(true);
-      audioRef.current.play();
+      setError(null);
+
+      if (audioRef.current) {
+        audioRef.current.play().catch((err) => {
+          console.warn("Audio play failed:", err);
+        });
+      }
+
       const res = await api.post("/api/order", {
         products: orderProducts,
         cardData,
@@ -140,11 +123,8 @@ export default function Cart({ cart, setCart }) {
         navigate("/dispensing", { state: { cart: res.data.cart } });
         setCart([]);
         setLocalCart([]);
-        setIsLoading(false);
-        audioRef.current.pause();
       } else {
         setError(res.data.error || "Order failed. Try again.");
-        setIsLoading(false);
       }
     } catch (err) {
       console.error(
@@ -157,8 +137,12 @@ export default function Cart({ cart, setCart }) {
         err.response?.data?.error ||
           "Error while placing order. Please try again."
       );
+    } finally {
       setIsLoading(false);
-      audioRef.current.stop();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     }
   };
 
@@ -173,6 +157,15 @@ export default function Cart({ cart, setCart }) {
         ← Back to Shop
       </Link>
       <h4>🛒 Your Shopping Cart</h4>
+
+      {/* MQTT Connection Status */}
+      {!isMqttConnected && (
+        <div className="connection-status connecting">
+          <span className="status-indicator">🔄</span>
+          <span>Connecting to card reader...</span>
+        </div>
+      )}
+
       {localCart.length === 0 ? (
         <div className="empty-cart-wrapper">
           <p className="empty-cart">Your cart is empty.</p>
@@ -201,6 +194,7 @@ export default function Cart({ cart, setCart }) {
                     <button
                       onClick={() => decreaseQty(index)}
                       aria-label="Decrease quantity"
+                      disabled={isLoading}
                     >
                       −
                     </button>
@@ -208,6 +202,7 @@ export default function Cart({ cart, setCart }) {
                     <button
                       onClick={() => increaseQty(index)}
                       aria-label="Increase quantity"
+                      disabled={isLoading}
                     >
                       +
                     </button>
@@ -221,6 +216,7 @@ export default function Cart({ cart, setCart }) {
                   <button
                     className="remove-btn"
                     onClick={() => removeItem(index)}
+                    disabled={isLoading}
                   >
                     🗑️ Remove
                   </button>
@@ -244,7 +240,15 @@ export default function Cart({ cart, setCart }) {
               <span className="total-amount">৳{totalPrice.toFixed(2)}</span>
             </div>
 
-            {cardData ? (
+            {/* Card Loading State */}
+            {isCardLoading ? (
+              <div className="card-loading">
+                <div className="card-loader-container">
+                  <div className="spinner"></div>
+                  <p className="loading-text">Waiting for card...</p>
+                </div>
+              </div>
+            ) : cardData ? (
               <div className="card-info">
                 <h3 className="card-info-title">💳 Payment Card Info</h3>
                 <div className="card-details">
@@ -258,10 +262,27 @@ export default function Cart({ cart, setCart }) {
                   </div>
                   <div className="card-detail-row">
                     <span className="detail-label">Available Credit:</span>
-                    <span className="detail-value credit-amount">
-                      ৳{cardData.credit.toFixed(2)}
-                    </span>
+                    {isBalanceChecking ? (
+                      "Checking Balance..."
+                    ) : (
+                      <span
+                        className={`detail-value credit-amount ${
+                          balance < totalPrice ? "insufficient" : ""
+                        }`}
+                      >
+                        ৳{balance.toFixed(2)}
+                      </span>
+                    )}
                   </div>
+                  {balance < totalPrice && (
+                    <div className="insufficient-balance-warning">
+                      <p className="warning-icon">⚠️</p>
+                      <p className="warning-text">
+                        Insufficient balance. Need ৳
+                        {(totalPrice - balance).toFixed(2)} more.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -273,25 +294,39 @@ export default function Cart({ cart, setCart }) {
               </div>
             )}
 
-            {/* {error && error !== "Please insert the card for checkout" && (
+            {/* Error Messages */}
+            {error && error !== "Please insert the card for checkout" && (
               <div className="error-message">
                 <p>❌ {error}</p>
               </div>
-            )} */}
+            )}
 
+            {/* Checkout Button */}
             {isLoading ? (
-              <Loader />
+              <div className="checkout-loading">
+                <Loader />
+                <p className="processing-text">Processing your order...</p>
+              </div>
             ) : (
               <button
                 className="checkout-btn"
                 onClick={checkout}
                 disabled={
                   !cardData ||
-                  cardData.credit < totalPrice ||
-                  error === "Invalid user card"
+                  balance < totalPrice ||
+                  isCardLoading ||
+                  !isMqttConnected
                 }
               >
-                {!cardData ? "Insert Card to Checkout" : "Proceed to Checkout"}
+                {!isMqttConnected
+                  ? "Connecting to Card Reader..."
+                  : isCardLoading
+                  ? "Waiting for Card..."
+                  : !cardData
+                  ? "Insert Card to Checkout"
+                  : balance < totalPrice
+                  ? "Insufficient Balance"
+                  : "Proceed to Checkout"}
               </button>
             )}
           </div>

@@ -407,3 +407,199 @@
     font-size: 1.5rem;
   }
 }
+
+
+
+
+
+/* Connection Status */
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-status.connecting {
+  background-color: #cfe2ff;
+  border-color: #0d6efd;
+}
+
+.status-indicator {
+  font-size: 1.2rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Card Loading State */
+.card-loading {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.card-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Insufficient Balance Warning */
+.insufficient-balance-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+}
+
+.insufficient-balance-warning .warning-icon {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.insufficient-balance-warning .warning-text {
+  color: #856404;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.credit-amount.insufficient {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Checkout Loading */
+.checkout-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.processing-text {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Disabled button states */
+.checkout-btn:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.quantity-controls button:disabled,
+.remove-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error Message Enhancement */
+.error-message {
+  padding: 12px 16px;
+  margin: 15px 0;
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  border-radius: 8px;
+  animation: shake 0.5s ease-in-out;
+}
+
+.error-message p {
+  color: #842029;
+  margin: 0;
+  font-weight: 500;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-loading {
+    padding: 20px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .loading-text {
+    font-size: 1rem;
+  }
+
+  .connection-status {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}
