@@ -5,6 +5,7 @@ import "./Cart.css";
 import noImg from "../no-image.png";
 import processSound from "../process.mp3";
 import Loader from "../components/Loader";
+import axios from "axios";
 
 export default function Cart({
   cart,
@@ -33,9 +34,12 @@ export default function Cart({
   const fetchCardBalance = async () => {
     try {
       setIsBalanceChecking(true);
-      const res = await api.post("/api/check-balance", {
-        cardData,
-      });
+      const res = await axios.post(
+        process.env.REACT_APP_API_URL + "/api/check-balance",
+        {
+          cardData,
+        }
+      );
       if (res.data.success) {
         setBalance(res.data.balance);
       }

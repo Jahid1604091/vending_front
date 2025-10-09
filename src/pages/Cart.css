@@ -603,3 +603,32 @@
     font-size: 0.9rem;
   }
 }
+
+/* Balance checking state */
+.checking-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6c757d;
+}
+
+.balance-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(108, 117, 125, 0.3);
+  border-top-color: #6c757d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Don't show insufficient warning while checking */
+.card-details:has(.checking-balance) .insufficient-balance-warning {
+  display: none;
+}

@@ -88,3 +88,20 @@
     height: 40px;
   }
 }
+
+.thanks-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #155724;
+  margin: 10px 0;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
