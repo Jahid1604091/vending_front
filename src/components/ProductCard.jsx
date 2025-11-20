@@ -29,13 +29,13 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
         >
           Buy Now
         </button>
-        <button
+        {/* <button
           className="button-slot button-cart"
           onClick={addToCart}
           disabled={isOutOfStock}
         >
           Add to Cart
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -191,7 +191,6 @@ export default function Dispensing() {
       <div className="dispensing-container">
         <div className="empty-dispensing">
           <h2>No items to dispense</h2>
-          <p>Redirecting to home...</p>
         </div>
       </div>
     );
@@ -201,7 +200,7 @@ export default function Dispensing() {
     <div className="dispensing-container">
       <div className="dispensing-header">
         <h1>🎁 Dispensing Your Order</h1>
-        <div className="progress-container">
+        {/* <div className="progress-container">
           <div className="progress-bar">
             <div
               className="progress-fill"
@@ -209,13 +208,12 @@ export default function Dispensing() {
             ></div>
           </div>
           <span className="progress-text">{getProgress()}% Complete</span>
-        </div>
+        </div> */}
         {allCompleted && (
           <div className="completion-message">
             <p className="success-icon">✅</p>
             <p className="success-text">All items dispensed successfully!</p>
             <p className="thanks-text">🔊 Thank you for your purchase!</p>
-            <p className="redirect-text">Redirecting to home...</p>
           </div>
         )}
       </div>

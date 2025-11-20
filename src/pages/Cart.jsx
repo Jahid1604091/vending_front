@@ -155,6 +155,30 @@ export default function Cart({
     0
   );
 
+useEffect(() => {
+  if (
+    cardData &&
+    !isCardLoading &&
+    isMqttConnected &&
+    !isBalanceChecking &&         // ✅ wait until balance API is finished
+    balance > 0 &&                // ✅ avoid triggering before actual balance load
+    balance >= totalPrice && 
+    localCart.length > 0 &&
+    !isLoading
+  ) {
+    checkout();
+  }
+}, [
+  cardData,
+  balance,
+  isCardLoading,
+  isMqttConnected,
+  isBalanceChecking,
+  totalPrice,
+  localCart
+]);
+
+
   return (
     <div className="cart-container">
       <Link to="/" className="back-link">
@@ -278,7 +302,7 @@ export default function Cart({
                       </span>
                     )}
                   </div>
-                  {balance < totalPrice && (
+                  { balance < totalPrice && (
                     <div className="insufficient-balance-warning">
                       <p className="warning-icon">⚠️</p>
                       <p className="warning-text">
@@ -305,34 +329,7 @@ export default function Cart({
               </div>
             )}
 
-            {/* Checkout Button */}
-            {isLoading ? (
-              <div className="checkout-loading">
-                <Loader />
-                <p className="processing-text">Processing your order...</p>
-              </div>
-            ) : (
-              <button
-                className="checkout-btn"
-                onClick={checkout}
-                disabled={
-                  !cardData ||
-                  balance < totalPrice ||
-                  isCardLoading ||
-                  !isMqttConnected
-                }
-              >
-                {!isMqttConnected
-                  ? "Connecting to Card Reader..."
-                  : isCardLoading
-                  ? "Waiting for Card..."
-                  : !cardData
-                  ? "Insert Card to Checkout"
-                  : balance < totalPrice
-                  ? "Insufficient Balance"
-                  : "Proceed to Checkout"}
-              </button>
-            )}
+
           </div>
         </div>
       )}

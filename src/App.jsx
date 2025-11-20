@@ -36,7 +36,7 @@ function App() {
 
   //mqtt connection
   useEffect(() => {
-    const mqttClient = mqtt.connect("ws://localhost:9003", {
+    const mqttClient = mqtt.connect(`ws://${process.env.REACT_APP_MQTT_HOST_PORT}`, {
       keepalive: 0,
       reconnectPeriod: 1000,
     });
@@ -61,6 +61,7 @@ function App() {
             // Request current card data after subscribing
             console.log("📨 Requesting current card data...");
             mqttClient.publish("card/request", "get_current", { qos: 1 });
+            
           }
         }
       );
