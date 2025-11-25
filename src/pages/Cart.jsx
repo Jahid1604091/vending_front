@@ -178,6 +178,16 @@ useEffect(() => {
   localCart
 ]);
 
+// Auto-redirect if no action within X seconds
+useEffect(() => {
+  const timeout = setTimeout(() => {
+    if (!isLoading && !isCardLoading) {
+      navigate("/");
+    }
+  }, 60*1000); 
+
+  return () => clearTimeout(timeout);
+}, [localCart, isLoading, isCardLoading]);
 
   return (
     <div className="cart-container">
