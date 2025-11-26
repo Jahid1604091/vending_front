@@ -36,11 +36,16 @@ function App() {
 
   //mqtt connection
   useEffect(() => {
-    const mqttClient = mqtt.connect(`ws://${process.env.REACT_APP_MQTT_HOST_PORT}`, {
+    const WS_URL =
+      process.env.REACT_APP_MQTT_HOST_PORT.startsWith("ws://") ||
+      process.env.REACT_APP_MQTT_HOST_PORT.startsWith("wss://")
+        ? process.env.REACT_APP_MQTT_HOST_PORT
+        : `ws://${process.env.REACT_APP_MQTT_HOST_PORT}`;
+
+    const mqttClient = mqtt.connect(WS_URL, {
       keepalive: 0,
       reconnectPeriod: 1000,
     });
-
     let cardRemovalTimeout = null;
 
     mqttClient.on("connect", () => {
@@ -61,7 +66,6 @@ function App() {
             // Request current card data after subscribing
             console.log("📨 Requesting current card data...");
             mqttClient.publish("card/request", "get_current", { qos: 1 });
-            
           }
         }
       );
@@ -149,16 +153,17 @@ function App() {
           <Route path="/" element={<Home cart={cart} setCart={setCart} />} />
           <Route
             path="/cart"
-            element={<Cart 
-              cart={cart} 
-              setCart={setCart} 
-              cardData={cardData}
-              error={error}
-              setError={setError}
-              isCardLoading={isCardLoading}
-              isMqttConnected={isMqttConnected}
-              
-              />}
+            element={
+              <Cart
+                cart={cart}
+                setCart={setCart}
+                cardData={cardData}
+                error={error}
+                setError={setError}
+                isCardLoading={isCardLoading}
+                isMqttConnected={isMqttConnected}
+              />
+            }
           />
           <Route
             path="/login"
