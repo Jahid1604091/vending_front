@@ -1,12 +1,14 @@
 import React from "react";
 import "./ProductCard.css";
 import noImg from "../no-image.png";
+
 const ProductCard = ({ product, addToCart, handleBuy }) => {
   const isOutOfStock = product.quantity === 0;
   const backendUrl = process.env.REACT_APP_API_URL; // Backend base URL
 
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={handleBuy}>
+      <div className="product-id">ID: {product.display_id}</div>
       <img
         className="product-image"
         src={product.image ? `${backendUrl}${product.image}?t=${Date.now()}` : noImg}
@@ -21,7 +23,13 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
       <p className={`product-stock ${isOutOfStock ? "out" : "in"}`}>
         {isOutOfStock ? "Out of Stock" : `Stock: ${product.quantity}`}
       </p>
-      <div className="product-buttons">
+      {product.group_id && (
+        <p className="product-group">
+          Group: {product.group_id} 
+          {product.product_ids && ` (Springs: ${product.product_ids.join(', ')})`}
+        </p>
+      )}
+      {/* <div className="product-buttons">
         <button
           className="button-slot button-buy"
           onClick={handleBuy}
@@ -29,14 +37,7 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
         >
           Buy Now
         </button>
-        {/* <button
-          className="button-slot button-cart"
-          onClick={addToCart}
-          disabled={isOutOfStock}
-        >
-          Add to Cart
-        </button> */}
-      </div>
+      </div> */}
     </div>
   );
 };
