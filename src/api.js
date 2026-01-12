@@ -6,11 +6,9 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const adminId = localStorage.getItem("adminId");
-  console.log(`API Interceptor: adminId=${adminId}, method=${config.method}, url=${config.url}`);
   if (adminId) {
     if (config.method.toLowerCase() === "get") {
       config.params = { ...config.params, adminId };
-      console.log(`Added adminId to params: ${JSON.stringify(config.params)}`);
     } else if (config.data instanceof FormData) {
       let hasAdminId = false;
       for (let [key] of config.data.entries()) {

@@ -43,8 +43,6 @@ export default function Dispensing() {
         });
       }
     });
-
-    console.log("📦 Generated productUnits:", units);
     
     if (units.length === 0) {
       console.log("🕒 No valid product units, redirecting to home");

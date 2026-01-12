@@ -44,12 +44,12 @@ export default function Home({ cart, setCart }) {
       } else {
         return [
           ...prevCart,
-          { 
+          {
             id: product.display_id,
             name: product.name,
             price: product.price,
             image: product.image,
-            quantity: 1, 
+            quantity: 1,
             stock: product.quantity,
             product_ids: product.product_ids,
             group_id: product.group_id
@@ -60,16 +60,20 @@ export default function Home({ cart, setCart }) {
   };
 
   const handleBuyNow = (product) => {
+    if (product.quantity < 1) {
+      alert('Stock Out , Please add this product')
+      return
+    }
     let updatedCart = cart;
     if (!cart.find((p) => p.id === product.display_id)) {
       updatedCart = [
         ...cart,
-        { 
+        {
           id: product.display_id,
           name: product.name,
           price: product.price,
           image: product.image,
-          quantity: 1, 
+          quantity: 1,
           stock: product.quantity,
           product_ids: product.product_ids,
           group_id: product.group_id
@@ -86,7 +90,7 @@ export default function Home({ cart, setCart }) {
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    switch(sortBy) {
+    switch (sortBy) {
       case "price-low":
         return filtered.sort((a, b) => a.price - b.price);
       case "price-high":
@@ -182,7 +186,7 @@ export default function Home({ cart, setCart }) {
             </button>
           </div>
         )}
-        
+
         {loading ? (
           <div className="loader-container">
             <Loader />
@@ -195,14 +199,14 @@ export default function Home({ cart, setCart }) {
                 <div className="no-products-icon">📦</div>
                 <h3>No products found</h3>
                 <p>
-                  {searchTerm 
+                  {searchTerm
                     ? `No results for "${searchTerm}". Try a different search term.`
                     : "No products available at the moment."
                   }
                 </p>
                 {searchTerm && (
-                  <button 
-                    className="clear-filter-btn" 
+                  <button
+                    className="clear-filter-btn"
                     onClick={() => setSearchTerm("")}
                   >
                     Clear Search
@@ -211,13 +215,13 @@ export default function Home({ cart, setCart }) {
               </div>
             ) : (
               <>
-                <div className="results-info">
+                {/* <div className="results-info">
                   Showing {filteredProducts.length} of {totalProducts} products
-                </div>
+                </div> */}
                 <div className="products-grid">
                   {filteredProducts.map((product, index) => (
-                    <div 
-                      key={product.display_id} 
+                    <div
+                      key={product.display_id}
                       className="product-card-wrapper"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
@@ -234,17 +238,6 @@ export default function Home({ cart, setCart }) {
           </>
         )}
       </div>
-
-      {/* Cart Float Button */}
-      {cart.length > 0 && (
-        <button 
-          className="cart-float-btn" 
-          onClick={() => navigate("/cart")}
-        >
-          <span className="cart-icon">🛒</span>
-          <span className="cart-count">{cart.length}</span>
-        </button>
-      )}
     </div>
   );
 }

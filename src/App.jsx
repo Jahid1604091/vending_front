@@ -38,7 +38,7 @@ function App() {
   useEffect(() => {
     const WS_URL =
       process.env.REACT_APP_MQTT_HOST_PORT.startsWith("ws://") ||
-      process.env.REACT_APP_MQTT_HOST_PORT.startsWith("wss://")
+        process.env.REACT_APP_MQTT_HOST_PORT.startsWith("wss://")
         ? process.env.REACT_APP_MQTT_HOST_PORT
         : `ws://${process.env.REACT_APP_MQTT_HOST_PORT}`;
 
@@ -108,7 +108,7 @@ function App() {
             setCardData(null);
             setError("Please insert the card for checkout");
             setIsCardLoading(false);
-          }, parseInt(process.env.REACT_APP_CARD_REMOVAL_TIMEOUT) || 5000);
+          }, parseInt(process.env.REACT_APP_CARD_REMOVAL_TIMEOUT) || 3000);
         } else {
           // Valid card data received
           setCardData(data);
@@ -171,7 +171,8 @@ function App() {
           />
           <Route
             path="/admin"
-            element={isAuthenticated ? <Admin /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Admin isAuthenticated={isAuthenticated}
+              onLogout={handleLogout} /> : <Navigate to="/login" />}
           />
           <Route path="/dispensing" element={<Dispensing />} />
         </Routes>

@@ -18,7 +18,6 @@ const Mqtt = () => {
         });
 
         client.on('message', (topic, message) => {
-          console.log('Received message:', topic, message.toString());
           setMessages((prevMessages) => [...prevMessages, message.toString()]);
         });
 
