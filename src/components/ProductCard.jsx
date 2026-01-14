@@ -19,6 +19,7 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
         }}
       />
       <h3 className="product-name">{product.name}</h3>
+      <h6 className="product-description">{product.description || ""}</h6>
       <p className="product-price">৳{product.price.toFixed(2)}</p>
     </div>
   );
@@ -35,6 +36,7 @@ const ProductCard = ({ product, addToCart, handleBuy }) => {
         }}
       />
       <h3 className="product-name">{product.name}</h3>
+       <h6 className="product-description">{product.description || ""}</h6>
       <p className="product-price">৳{product.price.toFixed(2)}</p>
     </div>
   );
